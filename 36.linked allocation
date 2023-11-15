@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define a block structure
+struct Block {
+    int data;
+    struct Block *next;
+};
+
+// Define a file structure
+struct File {
+    struct Block *firstBlock;
+    struct Block *lastBlock;
+};
+
+// Function to create a new block
+struct Block *createBlock(int data) {
+    struct Block *newBlock = (struct Block *)malloc(sizeof(struct Block));
+    newBlock->data = data;
+    newBlock->next = NULL;
+    return newBlock;
+}
+
+// Function to add a block to the file
+void addBlockToFile(struct File *file, int data) {
+    struct Block *newBlock = createBlock(data);
+
+    if (file->firstBlock == NULL) {
+        // If the file is empty, set both first and last blocks to the new block
+        file->firstBlock = newBlock;
+        file->lastBlock = newBlock;
+    } else {
+        // Add the new block to the end of the file
+        file->lastBlock->next = newBlock;
+        file->lastBlock = newBlock;
+    }
+}
+
+// Function to print the contents of a file
+void printFile(struct File *file) {
+    struct Block *currentBlock = file->firstBlock;
+
+    while (currentBlock != NULL) {
+        printf("%d ", currentBlock->data);
+        currentBlock = currentBlock->next;
+    }
+
+    printf("\n");
+}
+
+// Function to free the memory used by a file
+void freeFile(struct File *file) {
+    struct Block *currentBlock = file->firstBlock;
+    struct Block *nextBlock;
+
+    while (currentBlock != NULL) {
+        nextBlock = currentBlock->next;
+        free(currentBlock);
+        currentBlock = nextBlock;
+    }
+}
+
+int main() {
+    // Create two files
+    struct File file1 = {NULL, NULL};
+    struct File file2 = {NULL, NULL};
+
+    // Add blocks to the files
+    addBlockToFile(&file1, 1);
+    addBlockToFile(&file1, 2);
+    addBlockToFile(&file1, 3);
+
+    addBlockToFile(&file2, 10);
+    addBlockToFile(&file2, 20);
+
+    // Print the contents of the files
+    printf("File 1: ");
+    printFile(&file1);
+
+    printf("File 2: ");
+    printFile(&file2);
+
+    // Free the memory used by the files
+    freeFile(&file1);
+    freeFile(&file2);
+
+    return 0;
+}
