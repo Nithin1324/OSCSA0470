@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function to sort an array of integers in ascending order
+void sortRequests(int requestQueue[], int numRequests) {
+    for (int i = 0; i < numRequests - 1; i++) {
+        for (int j = 0; j < numRequests - i - 1; j++) {
+            if (requestQueue[j] > requestQueue[j + 1]) {
+                // Swap elements if they are in the wrong order
+                int temp = requestQueue[j];
+                requestQueue[j] = requestQueue[j + 1];
+                requestQueue[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to find the index of the disk request just greater than the initial head position
+int findStartingIndex(int requestQueue[], int numRequests, int initialHead) {
+    int start = 0;
+    for (int i = 0; i < numRequests; i++) {
+        if (requestQueue[i] >= initialHead) {
+            start = i;
+            break;
+        }
+    }
+    return start;
+}
+
+// Function to calculate the total head movement using C-SCAN
+int calculateTotalHeadMovement(int requestQueue[], int numRequests, int initialHead, int maxCylinder) {
+    sortRequests(requestQueue, numRequests);
+    
+    int totalHeadMovement = 0;
+    int startingIndex = findStartingIndex(requestQueue, numRequests, initialHead);
+
+    // Head movement towards the higher-numbered cylinders
+    for (int i = startingIndex; i < numRequests; i++) {
+        totalHeadMovement += abs(requestQueue[i] - initialHead);
+        initialHead = requestQueue[i];
+    }
+
+    // Head movement towards the lower-numbered cylinders
+    if (startingIndex > 0) {
+        totalHeadMovement += abs(maxCylinder - initialHead); // Move to the end of the disk
+        totalHeadMovement += maxCylinder; // Wrap around
+        initialHead = 0; // Move to the beginning of the disk
+
+        for (int i = 0; i < startingIndex; i++) {
+            totalHeadMovement += abs(requestQueue[i] - initialHead);
+            initialHead = requestQueue[i];
+        }
+    }
+
+    return totalHeadMovement;
+}
+
+int main() {
+    int numRequests;
+    int initialHead;
+    int maxCylinder;
+
+    // Input the number of requests
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &numRequests);
+
+    int requestQueue[numRequests];
+
+    // Input the initial position of the disk head
+    printf("Enter the initial position of the disk head: ");
+    scanf("%d", &initialHead);
+
+    // Input the maximum cylinder number
+    printf("Enter the maximum cylinder number: ");
+    scanf("%d", &maxCylinder);
+
+    // Input the disk request queue
+    printf("Enter the disk request queue:\n");
+    for (int i = 0; i < numRequests; i++) {
+        scanf("%d", &requestQueue[i]);
+    }
+
+    // Calculate and output the total head movement
+    int totalHeadMovement = calculateTotalHeadMovement(requestQueue, numRequests, initialHead, maxCylinder);
+    printf("Total head movement using C-SCAN: %d\n", totalHeadMovement);
+
+    return 0;
+}
